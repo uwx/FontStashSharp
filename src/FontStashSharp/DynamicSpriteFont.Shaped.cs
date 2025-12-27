@@ -281,7 +281,7 @@ namespace FontStashSharp
 			}
 #endif
 
-			var text = source.TextSource.StringText.String ?? source.TextSource.StringBuilderText?.ToString();
+			var text = source.TextSource.StringBuilderText?.ToString() ?? source.TextSource.StringText.String ?? source.TextSource.SpanText.ToString();
 			if (string.IsNullOrEmpty(text))
 			{
 				return 0.0f;

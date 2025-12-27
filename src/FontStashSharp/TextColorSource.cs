@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 
 #if MONOGAME || FNA || XNA
 using Microsoft.Xna.Framework;
@@ -40,8 +41,24 @@ namespace FontStashSharp
 			Colors = null;
 			ColorPosition = 0;
 		}
+		
+		public TextColorSource(ReadOnlySpan<char> text, Color color)
+		{
+			TextSource = new TextSource(text);
+			SingleColor = color;
+			Colors = null;
+			ColorPosition = 0;
+		}
 
 		public TextColorSource(StringSegment text, Color[] colors)
+		{
+			TextSource = new TextSource(text);
+			SingleColor = null;
+			Colors = colors;
+			ColorPosition = 0;
+		}
+
+		public TextColorSource(ReadOnlySpan<char> text, Color[] colors)
 		{
 			TextSource = new TextSource(text);
 			SingleColor = null;

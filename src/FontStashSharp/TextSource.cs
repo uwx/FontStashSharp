@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.Buffers;
+using System.Text;
 
 namespace FontStashSharp
 {
@@ -6,7 +8,16 @@ namespace FontStashSharp
 	{
 		public StringSegment StringText;
 		public StringBuilder StringBuilderText;
+		public ReadOnlySpan<char> SpanText;
 		private int Position;
+
+		public TextSource(ReadOnlySpan<char> text)
+		{
+			SpanText = text;
+			StringText = default;
+			StringBuilderText = null;
+			Position = 0;
+		}
 
 		public TextSource(string text)
 		{
@@ -34,6 +45,23 @@ namespace FontStashSharp
 		public bool GetNextCodepoint(out int result)
 		{
 			result = 0;
+			
+			if (!SpanText.IsEmpty)
+			{
+				if (Position >= SpanText.Length)
+				{
+					return false;
+				}
+
+				var opResult = Rune.DecodeFromUtf16(SpanText[Position..], out var rune, out var charsConsumed);
+				if (opResult != OperationStatus.Done)
+				{
+					ThrowInvalidString();
+				}
+				result = rune.Value;
+				Position += charsConsumed;
+				return true;
+			}
 
 			if (!StringText.IsNullOrEmpty)
 			{
@@ -42,8 +70,13 @@ namespace FontStashSharp
 					return false;
 				}
 
-				result = char.ConvertToUtf32(StringText.String, StringText.Offset + Position);
-				Position += char.IsSurrogatePair(StringText.String, StringText.Offset + Position) ? 2 : 1;
+				var opResult = Rune.DecodeFromUtf16(StringText.String.AsSpan((StringText.Offset + Position)..), out var rune, out var charsConsumed);
+				if (opResult != OperationStatus.Done)
+				{
+					ThrowInvalidString();
+				}
+				result = rune.Value;
+				Position += charsConsumed;
 				return true;
 			}
 
@@ -60,6 +93,11 @@ namespace FontStashSharp
 			}
 
 			return false;
+
+			void ThrowInvalidString()
+			{
+				throw new InvalidOperationException("Invalid UTF-16 sequence in TextSource.");
+			}
 		}
 
 		public void Reset()

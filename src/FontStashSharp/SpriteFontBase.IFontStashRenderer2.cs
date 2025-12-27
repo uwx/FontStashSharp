@@ -273,7 +273,46 @@ namespace FontStashSharp
 			float rotation = 0, Vector2 origin = default(Vector2), Vector2? scale = null,
 			float layerDepth = 0.0f, float characterSpacing = 0.0f, float lineSpacing = 0.0f,
 			TextStyle textStyle = TextStyle.None, FontSystemEffect effect = FontSystemEffect.None, int effectAmount = 0) =>
-				InternalDrawText2(renderer, new TextColorSource(text, colors), position, rotation, origin, scale, layerDepth,
+			InternalDrawText2(renderer, new TextColorSource(text, colors), position, rotation, origin, scale, layerDepth,
+				characterSpacing, lineSpacing, textStyle, effect, effectAmount);
+		/// <summary>
+		/// Draws a text
+		/// </summary>
+		/// <param name="renderer">A renderer</param>
+		/// <param name="text">The text which will be drawn</param>
+		/// <param name="position">The drawing location on screen</param>
+		/// <param name="color">A color mask</param>
+		/// <param name="rotation">A rotation of this text in radians</param>
+		/// <param name="origin">Center of the rotation</param>
+		/// <param name="scale">A scaling of this text. Null means the scaling is (1, 1)</param>
+		/// <param name="layerDepth">A depth of the layer of this string</param>
+		/// <param name="characterSpacing">A character spacing</param>
+		/// <param name="lineSpacing">A line spacing</param>
+		public float DrawText(IFontStashRenderer2 renderer, ReadOnlySpan<char> text, Vector2 position, Color color,
+			float rotation = 0, Vector2 origin = default(Vector2), Vector2? scale = null,
+			float layerDepth = 0.0f, float characterSpacing = 0.0f, float lineSpacing = 0.0f,
+			TextStyle textStyle = TextStyle.None, FontSystemEffect effect = FontSystemEffect.None, int effectAmount = 0) =>
+				InternalDrawText2(renderer, new TextColorSource(text, color), position, rotation, origin, scale, layerDepth,
 					characterSpacing, lineSpacing, textStyle, effect, effectAmount);
+
+		/// <summary>
+		/// Draws a text
+		/// </summary>
+		/// <param name="renderer">A renderer</param>
+		/// <param name="text">The text which will be drawn</param>
+		/// <param name="position">The drawing location on screen</param>
+		/// <param name="colors">Colors of glyphs</param>
+		/// <param name="rotation">A rotation of this text in radians</param>
+		/// <param name="origin">Center of the rotation</param>
+		/// <param name="scale">A scaling of this text. Null means the scaling is (1, 1)</param>
+		/// <param name="layerDepth">A depth of the layer of this string</param>
+		/// <param name="characterSpacing">A character spacing</param>
+		/// <param name="lineSpacing">A line spacing</param>
+		public float DrawText(IFontStashRenderer2 renderer, ReadOnlySpan<char> text, Vector2 position, Color[] colors,
+			float rotation = 0, Vector2 origin = default(Vector2), Vector2? scale = null,
+			float layerDepth = 0.0f, float characterSpacing = 0.0f, float lineSpacing = 0.0f,
+			TextStyle textStyle = TextStyle.None, FontSystemEffect effect = FontSystemEffect.None, int effectAmount = 0) =>
+			InternalDrawText2(renderer, new TextColorSource(text, colors), position, rotation, origin, scale, layerDepth,
+				characterSpacing, lineSpacing, textStyle, effect, effectAmount);
 	}
 }
