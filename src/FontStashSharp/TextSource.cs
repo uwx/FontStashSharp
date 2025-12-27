@@ -40,7 +40,7 @@ namespace FontStashSharp
 			Position = 0;
 		}
 
-		public bool IsNull => StringText.IsNullOrEmpty && StringBuilderText == null;
+		public bool IsNull => StringText.IsNullOrEmpty && StringBuilderText == null && SpanText.IsEmpty;
 
 		public bool GetNextCodepoint(out int result)
 		{
