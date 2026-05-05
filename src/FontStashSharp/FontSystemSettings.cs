@@ -23,6 +23,27 @@ namespace FontStashSharp
 		Stroked
 	}
 
+	/// <summary>
+	/// Determines how to produce final image(RGBA) from the rasterizer 8-bit source value
+	/// </summary>
+	public enum GlyphRenderResult
+	{
+		/// <summary>
+		/// RGBA set to the source value. Default option
+		/// </summary>
+		Premultiplied,
+
+		/// <summary>
+		/// RGB set to 255 and A set to the source value
+		/// </summary>
+		NonPremultiplied,
+
+		/// <summary>
+		/// RGBA set to 255 if the source value is non-zero. Otherwise RGBA set to 0
+		/// </summary>
+		NoAntialiasing
+	}
+
 	public class FontSystemSettings
 	{
 		private int _textureWidth = 1024, _textureHeight = 1024;
@@ -62,7 +83,29 @@ namespace FontStashSharp
 			}
 		}
 
-		public bool PremultiplyAlpha { get; set; } = true;
+		/// <summary>
+		/// Determines how to produce final image(RGBA) from the rasterizer 8-bit source value
+		/// </summary>
+		public GlyphRenderResult GlyphRenderResult { get; set; } = GlyphRenderResult.Premultiplied;
+
+		[Obsolete("Use GlyphRenderResult instead")]
+		public bool PremultiplyAlpha
+		{
+			get => GlyphRenderResult == GlyphRenderResult.Premultiplied;
+
+			set
+			{
+				if (value)
+				{
+					GlyphRenderResult = GlyphRenderResult.Premultiplied;
+				}
+				else
+				{
+					GlyphRenderResult = GlyphRenderResult.NonPremultiplied;
+				}
+			}
+		}
+
 
 		public GlyphRenderer GlyphRenderer { get; set; } = GlyphRenderers.Default;
 
@@ -112,6 +155,8 @@ namespace FontStashSharp
 
 		public bool StbTrueTypeUseOldRasterizer { get; set; }
 
+		public bool UseEmToPixelsScale { get; set; }
+
 		/// <summary>
 		/// Enable HarfBuzz text shaping for complex scripts (Arabic, Indic, emoji sequences, etc.)
 		/// When false, uses simple codepoint-to-glyph rendering
@@ -160,11 +205,12 @@ namespace FontStashSharp
 		{
 			TextureWidth = FontSystemDefaults.TextureWidth;
 			TextureHeight = FontSystemDefaults.TextureHeight;
-			PremultiplyAlpha = FontSystemDefaults.PremultiplyAlpha;
+			GlyphRenderResult = FontSystemDefaults.GlyphRenderResult;
 			FontResolutionFactor = FontSystemDefaults.FontResolutionFactor;
 			KernelWidth = FontSystemDefaults.KernelWidth;
 			KernelHeight = FontSystemDefaults.KernelHeight;
 			StbTrueTypeUseOldRasterizer = FontSystemDefaults.StbTrueTypeUseOldRasterizer;
+			UseEmToPixelsScale = FontSystemDefaults.UseEmToPixelsScale;
 			TextShaper = FontSystemDefaults.TextShaper;
 			FontLoader = FontSystemDefaults.FontLoader;
 			ShapedTextCacheSize = FontSystemDefaults.ShapedTextCacheSize;
@@ -176,12 +222,13 @@ namespace FontStashSharp
 			{
 				TextureWidth = TextureWidth,
 				TextureHeight = TextureHeight,
-				PremultiplyAlpha = PremultiplyAlpha,
+				GlyphRenderResult = GlyphRenderResult,
 				GlyphRenderer = GlyphRenderer,
 				FontResolutionFactor = FontResolutionFactor,
 				KernelWidth = KernelWidth,
 				KernelHeight = KernelHeight,
 				StbTrueTypeUseOldRasterizer = StbTrueTypeUseOldRasterizer,
+				UseEmToPixelsScale = UseEmToPixelsScale,
 				ExistingTexture = ExistingTexture,
 				ExistingTextureUsedSpace = ExistingTextureUsedSpace,
 				FontLoader = FontLoader,
