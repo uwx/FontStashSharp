@@ -4,6 +4,11 @@ using Microsoft.Xna.Framework.Graphics;
 using Stride.Core.Mathematics;
 using Stride.Graphics;
 using Texture2D = Stride.Graphics.Texture;
+#elif MOONWORKS
+using MoonWorks.Graphics;
+using VertexPositionColorTexture = FontStashSharp.MoonWorks.MoonWorksRenderer.VertexPositionColorTexture;
+using Texture2D = MoonWorks.Graphics.Texture;
+
 #else
 using System.Numerics;
 using Texture2D = System.Object;
@@ -42,7 +47,7 @@ namespace FontStashSharp.Interfaces
 
 	public interface IFontStashRenderer2
 	{
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 		GraphicsDevice GraphicsDevice { get; }
 #else
 		ITexture2DManager TextureManager { get; }

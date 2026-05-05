@@ -8,6 +8,12 @@ using Microsoft.Xna.Framework.Graphics;
 #elif STRIDE
 using Stride.Core.Mathematics;
 using Stride.Graphics;
+#elif MOONWORKS
+using System.Drawing;
+using System.Numerics;
+using Color = MoonWorks.Graphics.Color;
+using Matrix = System.Numerics.Matrix3x2;
+using VertexPositionColorTexture = FontStashSharp.MoonWorks.MoonWorksRenderer.VertexPositionColorTexture;
 #else
 using System.Numerics;
 using System.Drawing;
@@ -29,7 +35,7 @@ namespace FontStashSharp
 				return;
 			}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 			var white = GetWhite(renderer.GraphicsDevice);
 #else
 			var white = GetWhite(renderer.TextureManager);
@@ -61,7 +67,7 @@ namespace FontStashSharp
 				throw new ArgumentNullException(nameof(renderer));
 			}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 			if (renderer.GraphicsDevice == null)
 			{
 				throw new ArgumentNullException("renderer.GraphicsDevice can't be null.");
@@ -113,7 +119,7 @@ namespace FontStashSharp
 					continue;
 				}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 				var glyph = GetGlyph(renderer.GraphicsDevice, codepoint, effect, effectAmount);
 #else
 				var glyph = GetGlyph(renderer.TextureManager, codepoint, effect, effectAmount);

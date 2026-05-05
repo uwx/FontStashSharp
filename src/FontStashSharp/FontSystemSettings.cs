@@ -8,6 +8,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Stride.Core.Mathematics;
 using Stride.Graphics;
 using Texture2D = Stride.Graphics.Texture;
+#elif MOONWORKS
+using System.Drawing;
+using Texture2D = MoonWorks.Graphics.Texture;
 #else
 using System.Drawing;
 using System.Numerics;

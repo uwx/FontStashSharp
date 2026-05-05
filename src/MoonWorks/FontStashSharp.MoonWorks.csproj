@@ -4,7 +4,7 @@
     <PackageId>FontStashSharp.MoonWorks</PackageId>
     <AssemblyName>FontStashSharp.MoonWorks</AssemblyName>
     <Description>FontStashSharp for MoonWorks</Description>
-    <DefineConstants>$(DefineConstants);MOONWORKS;PLATFORM_AGNOSTIC</DefineConstants>
+    <DefineConstants>$(DefineConstants);MOONWORKS</DefineConstants>
     <OutputPath>bin\MoonWorks\$(Configuration)</OutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>

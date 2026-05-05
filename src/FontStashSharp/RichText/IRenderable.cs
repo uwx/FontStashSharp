@@ -1,9 +1,12 @@
-﻿using FontStashSharp.Interfaces;
-
-#if MONOGAME || FNA || XNA
+﻿#if MONOGAME || FNA || XNA
 using Microsoft.Xna.Framework;
 #elif STRIDE
 using Stride.Core.Mathematics;
+#elif MOONWORKS
+using System.Drawing;
+using System.Numerics;
+using Color = MoonWorks.Graphics.Color;
+
 #else
 using System.Drawing;
 using System.Numerics;

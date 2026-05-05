@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using FontStashSharp.Interfaces;
 
@@ -8,6 +8,13 @@ using Microsoft.Xna.Framework.Graphics;
 #elif STRIDE
 using Stride.Core.Mathematics;
 using Stride.Graphics;
+#elif MOONWORKS
+using System.Drawing;
+using System.Numerics;
+using MoonWorks.Graphics;
+using Color = MoonWorks.Graphics.Color;
+using Matrix = System.Numerics.Matrix3x2;
+using VertexPositionColorTexture = FontStashSharp.MoonWorks.MoonWorksRenderer.VertexPositionColorTexture;
 #else
 using System.Drawing;
 using System.Numerics;
@@ -158,7 +165,7 @@ namespace FontStashSharp
 		/// <summary>
 		/// Get a glyph by its glyph ID
 		/// </summary>
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 		internal DynamicFontGlyph GetGlyphById(GraphicsDevice device, int glyphId, int fontSourceIndex, FontSystemEffect effect, int effectAmount)
 #else
 		internal DynamicFontGlyph GetGlyphById(ITexture2DManager device, int glyphId, int fontSourceIndex, FontSystemEffect effect, int effectAmount)
@@ -279,7 +286,7 @@ namespace FontStashSharp
 				throw new ArgumentNullException(nameof(renderer));
 			}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 			if (renderer.GraphicsDevice == null)
 			{
 				throw new ArgumentNullException("renderer.GraphicsDevice can't be null.");
@@ -350,7 +357,7 @@ namespace FontStashSharp
 						pos.X += characterSpacing;
 					}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 					var glyph = GetGlyphById(renderer.GraphicsDevice, shapedGlyph.GlyphId, shapedGlyph.FontSourceId, effect, effectAmount);
 #else
 					var glyph = GetGlyphById(renderer.TextureManager, shapedGlyph.GlyphId, shapedGlyph.FontSourceId, effect, effectAmount);
@@ -408,7 +415,7 @@ namespace FontStashSharp
 				throw new ArgumentNullException(nameof(renderer));
 			}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 			if (renderer.GraphicsDevice == null)
 			{
 				throw new ArgumentNullException("renderer.GraphicsDevice can't be null.");
@@ -483,7 +490,7 @@ namespace FontStashSharp
 						pos.X += characterSpacing;
 					}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 					var glyph = GetGlyphById(renderer.GraphicsDevice, shapedGlyph.GlyphId, shapedGlyph.FontSourceId, effect, effectAmount);
 #else
 					var glyph = GetGlyphById(renderer.TextureManager, shapedGlyph.GlyphId, shapedGlyph.FontSourceId, effect, effectAmount);

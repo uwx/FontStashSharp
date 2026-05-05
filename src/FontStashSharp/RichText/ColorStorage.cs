@@ -6,6 +6,9 @@ using System.Reflection;
 using Microsoft.Xna.Framework;
 #elif STRIDE
 using Stride.Core.Mathematics;
+#elif MOONWORKS
+using Color = MoonWorks.Graphics.Color;
+
 #else
 using Color = FontStashSharp.FSColor;
 #endif

@@ -1,5 +1,4 @@
-﻿using FontStashSharp.Interfaces;
-using System;
+﻿using System;
 
 #if MONOGAME || FNA || XNA
 using Microsoft.Xna.Framework;
@@ -7,6 +6,10 @@ using Microsoft.Xna.Framework.Graphics;
 #elif STRIDE
 using Stride.Core.Mathematics;
 using Stride.Graphics;
+#elif MOONWORKS
+using System.Drawing;
+using MoonWorks.Graphics;
+
 #else
 using System.Drawing;
 using System.Numerics;
@@ -128,7 +131,7 @@ namespace FontStashSharp
 			return glyph;
 		}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 		private DynamicFontGlyph GetGlyphByCodepointInternal(GraphicsDevice device, int codepoint, FontSystemEffect effect, int effectAmount)
 #else
 		private DynamicFontGlyph GetGlyphByCodepointInternal(ITexture2DManager device, int codepoint, FontSystemEffect effect, int effectAmount)
@@ -148,7 +151,7 @@ namespace FontStashSharp
 			return glyph;
 		}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 		private DynamicFontGlyph GetGlyphByCodepoint(GraphicsDevice device, int codepoint, FontSystemEffect effect, int effectAmount)
 #else
 		private DynamicFontGlyph GetGlyphByCodepoint(ITexture2DManager device, int codepoint, FontSystemEffect effect, int effectAmount)
@@ -163,7 +166,7 @@ namespace FontStashSharp
 			return result;
 		}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 		protected internal override FontGlyph GetGlyph(GraphicsDevice device, int codepoint, FontSystemEffect effect, int effectAmount)
 #else
 		protected internal override FontGlyph GetGlyph(ITexture2DManager device, int codepoint, FontSystemEffect effect, int effectAmount)

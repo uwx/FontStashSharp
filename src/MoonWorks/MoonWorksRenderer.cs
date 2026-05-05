@@ -18,15 +18,14 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 	private const int MaxIndices = MaxQuads * 6;
 
 	private readonly GraphicsDevice _device;
-	private readonly MoonWorksTexture2DManager _textureManager;
-
-	public ITexture2DManager TextureManager => _textureManager;
+	
+	public GraphicsDevice GraphicsDevice => _device;
 
 	private readonly GpuBuffer _vertexBuffer;
 	private readonly GpuBuffer _indexBuffer;
 	private readonly Sampler _sampler;
 
-	private Vertex[] _vertices = new Vertex[MaxVertices];
+	private VertexPositionColorTexture[] _vertices = new VertexPositionColorTexture[MaxVertices];
 	private int _quadCount;
 	private object _currentTexture;
 
@@ -38,9 +37,8 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 	public MoonWorksRenderer(GraphicsDevice device)
 	{
 		_device = device ?? throw new ArgumentNullException(nameof(device));
-		_textureManager = new MoonWorksTexture2DManager(device);
 
-		_vertexBuffer = GpuBuffer.Create<Vertex>(device, BufferUsageFlags.Vertex, MaxVertices);
+		_vertexBuffer = GpuBuffer.Create<VertexPositionColorTexture>(device, BufferUsageFlags.Vertex, MaxVertices);
 		_indexBuffer = GpuBuffer.Create<ushort>(device, BufferUsageFlags.Index, MaxIndices);
 		_sampler = Sampler.Create(device, SamplerCreateInfo.LinearClamp);
 
@@ -93,7 +91,7 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 		_pipeline = null;
 	}
 
-	public void DrawQuad(object texture, ref VertexPositionColorTexture topLeft, ref VertexPositionColorTexture topRight, ref VertexPositionColorTexture bottomLeft, ref VertexPositionColorTexture bottomRight)
+	public void DrawQuad(Texture texture, ref VertexPositionColorTexture topLeft, ref VertexPositionColorTexture topRight, ref VertexPositionColorTexture bottomLeft, ref VertexPositionColorTexture bottomRight)
 	{
 		if (texture != _currentTexture)
 		{
@@ -105,10 +103,10 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 			Flush();
 
 		int vi = _quadCount * 4;
-		_vertices[vi + 0] = new Vertex(topLeft);
-		_vertices[vi + 1] = new Vertex(topRight);
-		_vertices[vi + 2] = new Vertex(bottomRight);
-		_vertices[vi + 3] = new Vertex(bottomLeft);
+		_vertices[vi + 0] = topLeft;
+		_vertices[vi + 1] = topRight;
+		_vertices[vi + 2] = bottomRight;
+		_vertices[vi + 3] = bottomLeft;
 		_quadCount++;
 	}
 
@@ -118,10 +116,10 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 			return;
 
 		int vertexCount = _quadCount * 4;
-		uint dataSize = (uint)(vertexCount * Marshal.SizeOf<Vertex>());
+		uint dataSize = (uint)(vertexCount * Marshal.SizeOf<VertexPositionColorTexture>());
 
-		var transferBuffer = TransferBuffer.Create<Vertex>(_device, TransferBufferUsage.Upload, (uint)vertexCount);
-		var span = transferBuffer.Map<Vertex>(false);
+		var transferBuffer = TransferBuffer.Create<VertexPositionColorTexture>(_device, TransferBufferUsage.Upload, (uint)vertexCount);
+		var span = transferBuffer.Map<VertexPositionColorTexture>(false);
 		_vertices.AsSpan(0, vertexCount).CopyTo(span);
 		transferBuffer.Unmap();
 
@@ -162,16 +160,25 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
-	public struct Vertex(VertexPositionColorTexture v) : IVertexType
+	public struct VertexPositionColorTexture : IVertexType
 	{
-		public Vector3 Position = v.Position;
-		public VertexStructs.Ubyte4Norm Color = new(
-			v.Color.R / 255f,
-			v.Color.G / 255f,
-			v.Color.B / 255f,
-			v.Color.A / 255f
-		);
-		public Vector2 TextureCoordinate = v.TextureCoordinate;
+		public Vector3 Position;
+		public VertexStructs.Ubyte4Norm Color;
+		public Vector2 TextureCoordinate;
+
+		public VertexPositionColorTexture(Vector3 position, Color color, Vector2 textureCoordinate)
+		{
+			Position = position;
+			Color = color;
+			TextureCoordinate = textureCoordinate;
+		}
+
+		public VertexPositionColorTexture(Vector3 position, VertexStructs.Ubyte4Norm color, Vector2 textureCoordinate)
+		{
+			Position = position;
+			Color = color;
+			TextureCoordinate = textureCoordinate;
+		}
 
 		public static VertexElementFormat[] Formats => [
 			VertexElementFormat.Float3,    // Position
@@ -181,8 +188,8 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 
 		public static uint[] Offsets => [
 			0,
-			(uint)Marshal.OffsetOf<Vertex>(nameof(Color)),
-			(uint)Marshal.OffsetOf<Vertex>(nameof(TextureCoordinate))
+			(uint)Marshal.OffsetOf<VertexPositionColorTexture>(nameof(Color)),
+			(uint)Marshal.OffsetOf<VertexPositionColorTexture>(nameof(TextureCoordinate))
 		];
 	}
 }

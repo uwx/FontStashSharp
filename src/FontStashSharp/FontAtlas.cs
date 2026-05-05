@@ -8,6 +8,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Stride.Graphics;
 using Stride.Core.Mathematics;
 using Texture2D = Stride.Graphics.Texture;
+#elif MOONWORKS
+using MoonWorks.Graphics;
+using Texture2D = MoonWorks.Graphics.Texture;
+using Texture2DManager = FontStashSharp.MoonWorks.Texture2DManager;
 #else
 using Texture2D = System.Object;
 using System.Drawing;
@@ -171,7 +175,7 @@ namespace FontStashSharp
 			return true;
 		}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 		public void RenderGlyph(GraphicsDevice graphicsDevice, DynamicFontGlyph glyph, IFontSource fontSource, GlyphRenderer glyphRenderer, GlyphRenderResult glyphRenderResult, int kernelWidth, int kernelHeight)
 #else
 		public void RenderGlyph(ITexture2DManager textureManager, DynamicFontGlyph glyph, IFontSource fontSource, GlyphRenderer glyphRenderer, GlyphRenderResult glyphRenderResult, int kernelWidth, int kernelHeight)
@@ -204,7 +208,7 @@ namespace FontStashSharp
 			// Create the atlas texture if required
 			if (Texture == null)
 			{
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 				Texture = Texture2DManager.CreateTexture(graphicsDevice, Width, Height);
 #else
 				Texture = textureManager.CreateTexture(Width, Height);
@@ -227,7 +231,7 @@ namespace FontStashSharp
 				eraseArea.Height = Height - eraseArea.Y;
 			}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 			Texture2DManager.SetTextureData(Texture, eraseArea, colorBuffer);
 #else
 			textureManager.SetTextureData(Texture, eraseArea, colorBuffer);
@@ -252,7 +256,7 @@ namespace FontStashSharp
 			glyphRenderer(buffer, colorBuffer, glyphRenderOptions);
 
 			// Render glyph to texture
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 			Texture2DManager.SetTextureData(Texture, glyph.TextureRectangle, colorBuffer);
 #else
 			textureManager.SetTextureData(Texture, glyph.TextureRectangle, colorBuffer);

@@ -9,19 +9,12 @@ namespace FontStashSharp.MoonWorks;
 /// <summary>
 /// Manages texture creation and data upload for FontStashSharp glyph atlases using MoonWorks.
 /// </summary>
-public class MoonWorksTexture2DManager : ITexture2DManager
+public static class Texture2DManager
 {
-	private readonly GraphicsDevice _device;
-
-	public MoonWorksTexture2DManager(GraphicsDevice device)
-	{
-		_device = device ?? throw new ArgumentNullException(nameof(device));
-	}
-
-	public object CreateTexture(int width, int height)
+	public static Texture CreateTexture(GraphicsDevice device, int width, int height)
 	{
 		return Texture.Create2D(
-			_device,
+			device,
 			(uint)width,
 			(uint)height,
 			TextureFormat.R8G8B8A8Unorm,
@@ -29,23 +22,16 @@ public class MoonWorksTexture2DManager : ITexture2DManager
 		);
 	}
 
-	public Point GetTextureSize(object texture)
+	public static void SetTextureData(Texture texture, Rectangle bounds, byte[] data)
 	{
-		var tex = (Texture)texture;
-		return new Point((int)tex.Width, (int)tex.Height);
-	}
-
-	public void SetTextureData(object texture, Rectangle bounds, byte[] data)
-	{
-		var tex = (Texture)texture;
 		var dataSize = (uint)(bounds.Width * bounds.Height * 4);
 
-		var transferBuffer = TransferBuffer.Create<byte>(_device, TransferBufferUsage.Upload, dataSize);
+		using var transferBuffer = TransferBuffer.Create<byte>(texture.Device, TransferBufferUsage.Upload, dataSize);
 		var span = transferBuffer.Map<byte>(false);
 		data.AsSpan(0, (int)dataSize).CopyTo(span);
 		transferBuffer.Unmap();
 
-		var cmd = _device.AcquireCommandBuffer();
+		var cmd = texture.Device.AcquireCommandBuffer();
 		var copyPass = cmd.BeginCopyPass();
 
 		copyPass.UploadToTexture(
@@ -56,7 +42,7 @@ public class MoonWorksTexture2DManager : ITexture2DManager
 			},
 			new TextureRegion
 			{
-				Texture = tex.Handle,
+				Texture = texture.Handle,
 				X = (uint)bounds.X,
 				Y = (uint)bounds.Y,
 				W = (uint)bounds.Width,
@@ -67,7 +53,6 @@ public class MoonWorksTexture2DManager : ITexture2DManager
 		);
 
 		cmd.EndCopyPass(copyPass);
-		_device.Submit(cmd);
-		transferBuffer.Dispose();
+		texture.Device.Submit(cmd);
 	}
 }

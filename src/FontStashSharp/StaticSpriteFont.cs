@@ -1,5 +1,4 @@
 ﻿using Cyotek.Drawing.BitmapFont;
-using FontStashSharp.Interfaces;
 using StbImageSharp;
 using System;
 using System.Collections.Generic;
@@ -13,6 +12,11 @@ using Microsoft.Xna.Framework.Graphics;
 using Stride.Core.Mathematics;
 using Stride.Graphics;
 using Texture2D = Stride.Graphics.Texture;
+#elif MOONWORKS
+using System.Drawing;
+using MoonWorks.Graphics;
+using Texture2D = MoonWorks.Graphics.Texture;
+using Texture2DManager = FontStashSharp.MoonWorks.Texture2DManager;
 #else
 using System.Drawing;
 using Texture2D = System.Object;
@@ -64,7 +68,7 @@ namespace FontStashSharp
 			return result;
 		}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 		protected internal override FontGlyph GetGlyph(GraphicsDevice device, int codepoint, FontSystemEffect effect, int effectAmount)
 #else
 		protected internal override FontGlyph GetGlyph(ITexture2DManager device, int codepoint, FontSystemEffect effect, int effectAmount)
@@ -177,7 +181,7 @@ namespace FontStashSharp
 			return FromBMFont(bmFont, textureGetter);
 		}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 		public static StaticSpriteFont FromBMFont(string data, Func<string, Stream> imageStreamOpener, GraphicsDevice device)
 #else
 		public static StaticSpriteFont FromBMFont(string data, Func<string, Stream> imageStreamOpener, ITexture2DManager textureManager)
@@ -215,7 +219,7 @@ namespace FontStashSharp
 						}
 					}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 					var texture = Texture2DManager.CreateTexture(device, image.Width, image.Height);
 					Texture2DManager.SetTextureData(texture, new Rectangle(0, 0, image.Width, image.Height), image.Data);
 #else

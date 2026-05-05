@@ -7,6 +7,12 @@ using Microsoft.Xna.Framework.Graphics;
 using Stride.Core.Mathematics;
 using Stride.Graphics;
 using Texture2D = Stride.Graphics.Texture;
+#elif MOONWORKS
+using System.Drawing;
+using System.Numerics;
+using Color = MoonWorks.Graphics.Color;
+using Texture2D = MoonWorks.Graphics.Texture;
+
 #else
 using System.Numerics;
 using System.Drawing;
@@ -45,6 +51,11 @@ namespace FontStashSharp.RichText
 #if MONOGAME || FNA || XNA || STRIDE
 		public TextureFragment(Texture2D texture) :
 			this(texture, new Rectangle(0, 0, texture.Width, texture.Height))
+		{
+		}
+#elif MOONWORKS
+		public TextureFragment(Texture2D texture) :
+			this(texture, new Rectangle(0, 0, (int)texture.Width, (int)texture.Height))
 		{
 		}
 #endif

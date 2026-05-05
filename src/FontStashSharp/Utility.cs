@@ -12,6 +12,13 @@ using Microsoft.Xna.Framework.Graphics;
 using Stride.Core.Mathematics;
 using Stride.Graphics;
 using Texture2D = Stride.Graphics.Texture;
+#elif MOONWORKS
+using System.Drawing;
+using System.Numerics;
+using Color = MoonWorks.Graphics.Color;
+using Texture2D = MoonWorks.Graphics.Texture;
+using Matrix = System.Numerics.Matrix3x2;
+using VertexPositionColorTexture = FontStashSharp.MoonWorks.MoonWorksRenderer.VertexPositionColorTexture;
 #else
 using System.Numerics;
 using System.Drawing;
@@ -234,6 +241,8 @@ namespace FontStashSharp
 		{
 #if MONOGAME || FNA || XNA || STRIDE
 			var textureSize = new Point(texture.Width, texture.Height);
+#elif MOONWORKS
+			var textureSize = new Point((int)texture.Width, (int)texture.Height);
 #else
 			var textureSize = renderer.TextureManager.GetTextureSize(texture);
 #endif

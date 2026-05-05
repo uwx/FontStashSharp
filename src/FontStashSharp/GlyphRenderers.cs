@@ -8,6 +8,9 @@ using static Microsoft.Xna.Framework.Graphics.SpriteFont;
 #elif STRIDE
 using Stride.Core.Mathematics;
 using Stride.Graphics;
+#elif MOONWORKS
+using System.Drawing;
+
 #else
 
 using System.Drawing;

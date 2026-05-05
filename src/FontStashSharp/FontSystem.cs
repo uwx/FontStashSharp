@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using FontStashSharp.Rasterizers.StbTrueTypeSharp;
-using System.Runtime.InteropServices;
 
 #if MONOGAME || FNA || XNA
 using Microsoft.Xna.Framework.Graphics;
@@ -12,6 +11,10 @@ using Microsoft.Xna.Framework;
 using Stride.Core.Mathematics;
 using Stride.Graphics;
 using Texture2D = Stride.Graphics.Texture;
+#elif MOONWORKS
+using System.Drawing;
+using MoonWorks.Graphics;
+using Texture2D = MoonWorks.Graphics.Texture;
 #else
 using System.Drawing;
 using Texture2D = System.Object;
@@ -220,7 +223,7 @@ namespace FontStashSharp
 			return _settings.TextShaper.Shape(text, fontSize, this);
 		}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 		private FontAtlas CreateFontAtlas(GraphicsDevice device, int textureWidth, int textureHeight)
 #else
 		private FontAtlas CreateFontAtlas(ITexture2DManager device, int textureWidth, int textureHeight)
@@ -248,7 +251,7 @@ namespace FontStashSharp
 			return fontAtlas;
 		}
 
-#if MONOGAME || FNA || XNA || STRIDE
+#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 		internal void RenderGlyphOnAtlas(GraphicsDevice device, DynamicFontGlyph glyph)
 #else
 		internal void RenderGlyphOnAtlas(ITexture2DManager device, DynamicFontGlyph glyph)
@@ -260,6 +263,8 @@ namespace FontStashSharp
 			{
 #if MONOGAME || FNA || XNA || STRIDE
 				textureSize = new Point(ExistingTexture.Width, ExistingTexture.Height);
+#elif MOONWORKS
+				textureSize = new Point((int) ExistingTexture.Width, (int) ExistingTexture.Height);
 #else
 				textureSize = device.GetTextureSize(ExistingTexture);
 #endif
