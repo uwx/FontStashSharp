@@ -17,10 +17,10 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 	private const int MaxVertices = MaxQuads * 4;
 	private const int MaxIndices = MaxQuads * 6;
 
-	public GraphicsDevice GraphicsDevice => _device;
-
 	private readonly GraphicsDevice _device;
 	private readonly MoonWorksTexture2DManager _textureManager;
+
+	public ITexture2DManager TextureManager => _textureManager;
 
 	private readonly GpuBuffer _vertexBuffer;
 	private readonly GpuBuffer _indexBuffer;
@@ -93,7 +93,7 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 		_pipeline = null;
 	}
 
-	public void DrawQuad(Texture texture, ref Vertex topLeft, ref Vertex topRight, ref Vertex bottomLeft, ref Vertex bottomRight)
+	public void DrawQuad(object texture, ref VertexPositionColorTexture topLeft, ref VertexPositionColorTexture topRight, ref VertexPositionColorTexture bottomLeft, ref VertexPositionColorTexture bottomRight)
 	{
 		if (texture != _currentTexture)
 		{
@@ -105,10 +105,10 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 			Flush();
 
 		int vi = _quadCount * 4;
-		_vertices[vi + 0] = topLeft;
-		_vertices[vi + 1] = topRight;
-		_vertices[vi + 2] = bottomRight;
-		_vertices[vi + 3] = bottomLeft;
+		_vertices[vi + 0] = new Vertex(topLeft);
+		_vertices[vi + 1] = new Vertex(topRight);
+		_vertices[vi + 2] = new Vertex(bottomRight);
+		_vertices[vi + 3] = new Vertex(bottomLeft);
 		_quadCount++;
 	}
 
@@ -162,23 +162,16 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
-	public struct Vertex : IVertexType
+	public struct Vertex(VertexPositionColorTexture v) : IVertexType
 	{
-		public Vector3 Position;
-		public VertexStructs.Ubyte4Norm Color;
-		public Vector2 TextureCoordinate;
-
-		// public Vertex(VertexPositionColorTexture v)
-		// {
-		// 	Position = v.Position;
-		// 	Color = new VertexStructs.Ubyte4Norm(
-		// 		v.Color.R / 255f,
-		// 		v.Color.G / 255f,
-		// 		v.Color.B / 255f,
-		// 		v.Color.A / 255f
-		// 	);
-		// 	TexCoord = v.TextureCoordinate;
-		// }
+		public Vector3 Position = v.Position;
+		public VertexStructs.Ubyte4Norm Color = new(
+			v.Color.R / 255f,
+			v.Color.G / 255f,
+			v.Color.B / 255f,
+			v.Color.A / 255f
+		);
+		public Vector2 TextureCoordinate = v.TextureCoordinate;
 
 		public static VertexElementFormat[] Formats => [
 			VertexElementFormat.Float3,    // Position
