@@ -22,13 +22,13 @@ public static class Texture2DManager
 		);
 	}
 
-	public static void SetTextureData(Texture texture, Rectangle bounds, byte[] data)
+	public static void SetTextureData(Texture texture, Rectangle bounds, ReadOnlySpan<byte> data)
 	{
 		var dataSize = (uint)(bounds.Width * bounds.Height * 4);
 
 		using var transferBuffer = TransferBuffer.Create<byte>(texture.Device, TransferBufferUsage.Upload, dataSize);
 		var span = transferBuffer.Map<byte>(false);
-		data.AsSpan(0, (int)dataSize).CopyTo(span);
+		data[..(int)dataSize].CopyTo(span);
 		transferBuffer.Unmap();
 
 		var cmd = texture.Device.AcquireCommandBuffer();
