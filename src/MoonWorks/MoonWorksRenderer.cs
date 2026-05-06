@@ -43,7 +43,7 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 		_sampler = Sampler.Create(device, SamplerCreateInfo.LinearClamp);
 
 		// Build static index buffer (quad indices)
-		var transferBuffer = TransferBuffer.Create<ushort>(device, TransferBufferUsage.Upload, MaxIndices);
+		using var transferBuffer = TransferBuffer.Create<ushort>(device, TransferBufferUsage.Upload, MaxIndices);
 		var indices = transferBuffer.Map<ushort>(false);
 		for (int i = 0; i < MaxQuads; i++)
 		{
@@ -60,10 +60,9 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 
 		var cmd = device.AcquireCommandBuffer();
 		var copyPass = cmd.BeginCopyPass();
-		copyPass.UploadToBuffer(transferBuffer, _indexBuffer, false);
+		copyPass.UploadToBuffer<ushort>(transferBuffer, _indexBuffer, 0, 0, MaxIndices, false);
 		cmd.EndCopyPass(copyPass);
 		device.Submit(cmd);
-		transferBuffer.Dispose();
 	}
 
 	/// <summary>
@@ -116,20 +115,15 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 			return;
 
 		int vertexCount = _quadCount * 4;
-		uint dataSize = (uint)(vertexCount * Marshal.SizeOf<VertexPositionColorTexture>());
 
-		var transferBuffer = TransferBuffer.Create<VertexPositionColorTexture>(_device, TransferBufferUsage.Upload, (uint)vertexCount);
+		using var transferBuffer = TransferBuffer.Create<VertexPositionColorTexture>(_device, TransferBufferUsage.Upload, (uint)vertexCount);
 		var span = transferBuffer.Map<VertexPositionColorTexture>(false);
 		_vertices.AsSpan(0, vertexCount).CopyTo(span);
 		transferBuffer.Unmap();
 
 		var copyCmd = _device.AcquireCommandBuffer();
 		var copyPass = copyCmd.BeginCopyPass();
-		copyPass.UploadToBuffer(
-			new TransferBufferLocation(transferBuffer, 0),
-			new BufferRegion(_vertexBuffer, 0, dataSize),
-			true
-		);
+		copyPass.UploadToBuffer<VertexPositionColorTexture>(transferBuffer, _vertexBuffer, 0, 0, (uint)vertexCount, true);
 		copyCmd.EndCopyPass(copyPass);
 		_device.Submit(copyCmd);
 
@@ -148,7 +142,6 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 			0
 		);
 
-		transferBuffer.Dispose();
 		_quadCount = 0;
 	}
 
