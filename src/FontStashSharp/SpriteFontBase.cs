@@ -47,7 +47,9 @@ namespace FontStashSharp
 			LineHeight = lineHeight;
 		}
 
-#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
+#if MOONWORKS
+		protected internal abstract FontGlyph GetGlyph(GraphicsDevice device, ResourceUploader resourceUploader, int codepoint, FontSystemEffect effect, int effectAmount);
+#elif MONOGAME || FNA || XNA || STRIDE
 		protected internal abstract FontGlyph GetGlyph(GraphicsDevice device, int codepoint, FontSystemEffect effect, int effectAmount);
 #else
 		protected internal abstract FontGlyph GetGlyph(ITexture2DManager device, int codepoint, FontSystemEffect effect, int effectAmount);
@@ -96,7 +98,11 @@ namespace FontStashSharp
 					continue;
 				}
 
+#if MOONWORKS
+				var glyph = GetGlyph(null, null, codepoint, effect, effectAmount);
+#else
 				var glyph = GetGlyph(null, codepoint, effect, effectAmount);
+#endif
 				if (glyph == null)
 				{
 					continue;
@@ -199,7 +205,11 @@ namespace FontStashSharp
 				}
 				else
 				{
+#if MOONWORKS
+					var glyph = GetGlyph(null, null, codepoint, effect, effectAmount);
+#else
 					var glyph = GetGlyph(null, codepoint, effect, effectAmount);
+#endif
 					if (glyph != null)
 					{
 						if (prevGlyph != null)
@@ -299,7 +309,9 @@ namespace FontStashSharp
 
 		internal abstract float GetKerning(FontGlyph glyph, FontGlyph prevGlyph);
 
-#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
+#if MOONWORKS
+		public static Texture2D GetWhite(GraphicsDevice graphicsDevice, ResourceUploader resourceUploader)
+#elif MONOGAME || FNA || XNA || STRIDE
 		public static Texture2D GetWhite(GraphicsDevice graphicsDevice)
 #else
 		public static Texture2D GetWhite(ITexture2DManager textureManager)
@@ -310,7 +322,10 @@ namespace FontStashSharp
 				return _white;
 			}
 
-#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
+#if MOONWORKS
+			_white = Texture2DManager.CreateTexture(graphicsDevice, 1, 1);
+			Texture2DManager.SetTextureData(resourceUploader, _white, new Rectangle(0, 0, 1, 1), new byte[] { 255, 255, 255, 255 });
+#elif MONOGAME || FNA || XNA || STRIDE
 			_white = Texture2DManager.CreateTexture(graphicsDevice, 1, 1);
 			Texture2DManager.SetTextureData(_white, new Rectangle(0, 0, 1, 1), new byte[] { 255, 255, 255, 255 });
 #else

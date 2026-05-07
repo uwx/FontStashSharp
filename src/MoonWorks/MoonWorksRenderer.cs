@@ -17,8 +17,10 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 	private const int MaxVertices = MaxQuads * 4;
 	private const int MaxIndices = MaxQuads * 6;
 
+	private readonly ResourceUploader _uploader;
 	private readonly GraphicsDevice _device;
-	
+
+	public ResourceUploader ResourceUploader => _uploader;
 	public GraphicsDevice GraphicsDevice => _device;
 
 	private readonly GpuBuffer _vertexBuffer;
@@ -34,9 +36,13 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 	private CommandBuffer _commandBuffer;
 	private GraphicsPipeline _pipeline;
 
-	public MoonWorksRenderer(GraphicsDevice device)
+	public MoonWorksRenderer(GraphicsDevice device, ResourceUploader uploader)
 	{
-		_device = device ?? throw new ArgumentNullException(nameof(device));
+		ArgumentNullException.ThrowIfNull(device);
+		ArgumentNullException.ThrowIfNull(uploader);
+
+		_device = device;
+		_uploader = uploader;
 
 		_vertexBuffer = GpuBuffer.Create<VertexPositionColorTexture>(device, BufferUsageFlags.Vertex, MaxVertices);
 		_indexBuffer = GpuBuffer.Create<ushort>(device, BufferUsageFlags.Index, MaxIndices);
@@ -173,16 +179,16 @@ public class MoonWorksRenderer : IFontStashRenderer2, IDisposable
 			TextureCoordinate = textureCoordinate;
 		}
 
-		public static VertexElementFormat[] Formats => [
+		public static ReadOnlySpan<VertexElementFormat> Formats => [
 			VertexElementFormat.Float3,    // Position
 			VertexElementFormat.Ubyte4Norm, // Color
 			VertexElementFormat.Float2     // TexCoord
 		];
 
-		public static uint[] Offsets => [
+		public static unsafe ReadOnlySpan<uint> Offsets => [
 			0,
-			(uint)Marshal.OffsetOf<VertexPositionColorTexture>(nameof(Color)),
-			(uint)Marshal.OffsetOf<VertexPositionColorTexture>(nameof(TextureCoordinate))
+			12,
+			16
 		];
 	}
 }

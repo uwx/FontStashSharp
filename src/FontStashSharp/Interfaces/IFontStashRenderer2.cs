@@ -47,6 +47,10 @@ namespace FontStashSharp.Interfaces
 
 	public interface IFontStashRenderer2
 	{
+#if MOONWORKS
+		ResourceUploader ResourceUploader { get; }
+#endif
+		
 #if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 		GraphicsDevice GraphicsDevice { get; }
 #else

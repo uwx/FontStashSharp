@@ -131,7 +131,9 @@ namespace FontStashSharp
 			return glyph;
 		}
 
-#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
+#if MOONWORKS
+		private DynamicFontGlyph GetGlyphByCodepointInternal(GraphicsDevice device, ResourceUploader resourceUploader, int codepoint, FontSystemEffect effect, int effectAmount)
+#elif MONOGAME || FNA || XNA || STRIDE
 		private DynamicFontGlyph GetGlyphByCodepointInternal(GraphicsDevice device, int codepoint, FontSystemEffect effect, int effectAmount)
 #else
 		private DynamicFontGlyph GetGlyphByCodepointInternal(ITexture2DManager device, int codepoint, FontSystemEffect effect, int effectAmount)
@@ -143,36 +145,60 @@ namespace FontStashSharp
 				return null;
 			}
 
+#if MOONWORKS
+			if (device == null || resourceUploader == null || glyph.Texture != null)
+#else
 			if (device == null || glyph.Texture != null)
+#endif
 				return glyph;
 
+#if MOONWORKS
+			FontSystem.RenderGlyphOnAtlas(device, resourceUploader, glyph);
+#else
 			FontSystem.RenderGlyphOnAtlas(device, glyph);
+#endif
 
 			return glyph;
 		}
 
-#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
+#if MOONWORKS
+		private DynamicFontGlyph GetGlyphByCodepoint(GraphicsDevice device, ResourceUploader resourceUploader, int codepoint, FontSystemEffect effect, int effectAmount)
+#elif MONOGAME || FNA || XNA || STRIDE
 		private DynamicFontGlyph GetGlyphByCodepoint(GraphicsDevice device, int codepoint, FontSystemEffect effect, int effectAmount)
 #else
 		private DynamicFontGlyph GetGlyphByCodepoint(ITexture2DManager device, int codepoint, FontSystemEffect effect, int effectAmount)
 #endif
 		{
+#if MOONWORKS
+			var result = GetGlyphByCodepointInternal(device, resourceUploader, codepoint, effect, effectAmount);
+#else
 			var result = GetGlyphByCodepointInternal(device, codepoint, effect, effectAmount);
+#endif
 			if (result == null && FontSystem.DefaultCharacter != null)
 			{
+#if MOONWORKS
+				result = GetGlyphByCodepointInternal(device, resourceUploader, FontSystem.DefaultCharacter.Value, effect, effectAmount);
+#else
 				result = GetGlyphByCodepointInternal(device, FontSystem.DefaultCharacter.Value, effect, effectAmount);
+#endif
 			}
 
 			return result;
 		}
 
-#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
+#if MOONWORKS
+		protected internal override FontGlyph GetGlyph(GraphicsDevice device, ResourceUploader resourceUploader, int codepoint, FontSystemEffect effect, int effectAmount)
+#elif MONOGAME || FNA || XNA || STRIDE
 		protected internal override FontGlyph GetGlyph(GraphicsDevice device, int codepoint, FontSystemEffect effect, int effectAmount)
 #else
 		protected internal override FontGlyph GetGlyph(ITexture2DManager device, int codepoint, FontSystemEffect effect, int effectAmount)
 #endif
 		{
+#if MOONWORKS
+			return GetGlyphByCodepoint(device, resourceUploader, codepoint, effect, effectAmount);
+#else
 			return GetGlyphByCodepoint(device, codepoint, effect, effectAmount);
+#endif
 		}
 
 		private void GetMetrics(int fontSourceIndex, out FontMetrics result)
@@ -206,7 +232,11 @@ namespace FontStashSharp
 					break;
 				}
 
+#if MOONWORKS
+				var glyph = GetGlyphByCodepoint(null, null, codepoint, effect, effectAmount);
+#else
 				var glyph = GetGlyphByCodepoint(null, codepoint, effect, effectAmount);
+#endif
 				if (glyph == null)
 				{
 					continue;

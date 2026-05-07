@@ -22,37 +22,22 @@ public static class Texture2DManager
 		);
 	}
 
-	public static void SetTextureData(Texture texture, Rectangle bounds, ReadOnlySpan<byte> data)
+	public static void SetTextureData(ResourceUploader uploader, Texture texture, Rectangle bounds, ReadOnlySpan<byte> data)
 	{
 		var dataSize = (uint)(bounds.Width * bounds.Height * 4);
-
-		using var transferBuffer = TransferBuffer.Create<byte>(texture.Device, TransferBufferUsage.Upload, dataSize);
-		var span = transferBuffer.Map<byte>(false);
-		data[..(int)dataSize].CopyTo(span);
-		transferBuffer.Unmap();
-
-		var cmd = texture.Device.AcquireCommandBuffer();
-		var copyPass = cmd.BeginCopyPass();
-
-		copyPass.UploadToTexture(
-			new TextureTransferInfo
-			{
-				TransferBuffer = transferBuffer.Handle,
-				Offset = 0,
-			},
+		
+		uploader.SetTextureData(
 			new TextureRegion
 			{
-				Texture = texture.Handle,
+				Texture = texture,
 				X = (uint)bounds.X,
 				Y = (uint)bounds.Y,
 				W = (uint)bounds.Width,
 				H = (uint)bounds.Height,
 				D = 1
 			},
+			data[..(int)dataSize],
 			false
 		);
-
-		cmd.EndCopyPass(copyPass);
-		texture.Device.Submit(cmd);
 	}
 }

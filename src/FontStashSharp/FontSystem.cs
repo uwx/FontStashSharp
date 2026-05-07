@@ -242,7 +242,7 @@ namespace FontStashSharp
 			{
 				if (!fontAtlas.AddSkylineLevel(0, ExistingTextureUsedSpace.X, ExistingTextureUsedSpace.Y, ExistingTextureUsedSpace.Width, ExistingTextureUsedSpace.Height))
 				{
-					throw new Exception(string.Format("Unable to specify existing texture used space: {0}", ExistingTextureUsedSpace));
+					throw new Exception($"Unable to specify existing texture used space: {ExistingTextureUsedSpace}");
 				}
 
 				// TODO: Clear remaining space
@@ -251,7 +251,9 @@ namespace FontStashSharp
 			return fontAtlas;
 		}
 
-#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
+#if MOONWORKS
+		internal void RenderGlyphOnAtlas(GraphicsDevice device, ResourceUploader resourceUploader, DynamicFontGlyph glyph)
+#elif MONOGAME || FNA || XNA || STRIDE
 		internal void RenderGlyphOnAtlas(GraphicsDevice device, DynamicFontGlyph glyph)
 #else
 		internal void RenderGlyphOnAtlas(ITexture2DManager device, DynamicFontGlyph glyph)
@@ -294,14 +296,18 @@ namespace FontStashSharp
 				// Try to add again
 				if (!atlas.AddRect(gw, gh, ref gx, ref gy))
 				{
-					throw new Exception(string.Format("Could not add rect to the newly created atlas. gw={0}, gh={1}", gw, gh));
+					throw new Exception($"Could not add rect to the newly created atlas. gw={gw}, gh={gh}");
 				}
 			}
 
 			glyph.TextureOffset.X = gx + GlyphPad;
 			glyph.TextureOffset.Y = gy + GlyphPad;
 
+#if MOONWORKS
+			atlas.RenderGlyph(device, resourceUploader, glyph, FontSources[glyph.FontSourceIndex], GlyphRenderer, GlyphRenderResult, KernelWidth, KernelHeight);
+#else
 			atlas.RenderGlyph(device, glyph, FontSources[glyph.FontSourceIndex], GlyphRenderer, GlyphRenderResult, KernelWidth, KernelHeight);
+#endif
 
 			glyph.Texture = atlas.Texture;
 		}

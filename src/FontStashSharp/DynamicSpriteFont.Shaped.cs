@@ -165,7 +165,9 @@ namespace FontStashSharp
 		/// <summary>
 		/// Get a glyph by its glyph ID
 		/// </summary>
-#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
+#if MOONWORKS
+		internal DynamicFontGlyph GetGlyphById(GraphicsDevice device, ResourceUploader resourceUploader, int glyphId, int fontSourceIndex, FontSystemEffect effect, int effectAmount)
+#elif MONOGAME || FNA || XNA || STRIDE
 		internal DynamicFontGlyph GetGlyphById(GraphicsDevice device, int glyphId, int fontSourceIndex, FontSystemEffect effect, int effectAmount)
 #else
 		internal DynamicFontGlyph GetGlyphById(ITexture2DManager device, int glyphId, int fontSourceIndex, FontSystemEffect effect, int effectAmount)
@@ -188,7 +190,11 @@ namespace FontStashSharp
 			{
 				if (device != null && glyph.Texture == null)
 				{
+#if MOONWORKS
+					FontSystem.RenderGlyphOnAtlas(device, resourceUploader, glyph);
+#else
 					FontSystem.RenderGlyphOnAtlas(device, glyph);
+#endif
 				}
 				return glyph;
 			}
@@ -219,7 +225,11 @@ namespace FontStashSharp
 
 			if (device != null && glyph.Texture == null)
 			{
+#if MOONWORKS
+				FontSystem.RenderGlyphOnAtlas(device, resourceUploader, glyph);
+#else
 				FontSystem.RenderGlyphOnAtlas(device, glyph);
+#endif
 			}
 
 			return glyph;
@@ -289,7 +299,7 @@ namespace FontStashSharp
 #if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 			if (renderer.GraphicsDevice == null)
 			{
-				throw new ArgumentNullException("renderer.GraphicsDevice can't be null.");
+				throw new ArgumentNullException(nameof(renderer.GraphicsDevice), "renderer.GraphicsDevice can't be null.");
 			}
 #else
 			if (renderer.TextureManager == null)
@@ -357,7 +367,9 @@ namespace FontStashSharp
 						pos.X += characterSpacing;
 					}
 
-#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
+#if MOONWORKS
+					var glyph = GetGlyphById(renderer.GraphicsDevice, renderer.ResourceUploader, shapedGlyph.GlyphId, shapedGlyph.FontSourceId, effect, effectAmount);
+#elif MONOGAME || FNA || XNA || STRIDE
 					var glyph = GetGlyphById(renderer.GraphicsDevice, shapedGlyph.GlyphId, shapedGlyph.FontSourceId, effect, effectAmount);
 #else
 					var glyph = GetGlyphById(renderer.TextureManager, shapedGlyph.GlyphId, shapedGlyph.FontSourceId, effect, effectAmount);
@@ -490,7 +502,9 @@ namespace FontStashSharp
 						pos.X += characterSpacing;
 					}
 
-#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
+#if MOONWORKS
+					var glyph = GetGlyphById(renderer.GraphicsDevice, renderer.ResourceUploader, shapedGlyph.GlyphId, shapedGlyph.FontSourceId, effect, effectAmount);
+#elif MONOGAME || FNA || XNA || STRIDE
 					var glyph = GetGlyphById(renderer.GraphicsDevice, shapedGlyph.GlyphId, shapedGlyph.FontSourceId, effect, effectAmount);
 #else
 					var glyph = GetGlyphById(renderer.TextureManager, shapedGlyph.GlyphId, shapedGlyph.FontSourceId, effect, effectAmount);
@@ -584,7 +598,11 @@ namespace FontStashSharp
 						x += characterSpacing;
 					}
 
+#if MOONWORKS
+					var glyph = GetGlyphById(null, null, shapedGlyph.GlyphId, shapedGlyph.FontSourceId, effect, effectAmount);
+#else
 					var glyph = GetGlyphById(null, shapedGlyph.GlyphId, shapedGlyph.FontSourceId, effect, effectAmount);
+#endif
 					if (glyph != null && !glyph.IsEmpty)
 					{
 						var glyphX = x + glyph.RenderOffset.X + shapedGlyph.XOffset;
@@ -664,7 +682,11 @@ namespace FontStashSharp
 
 					var glyphPos = pos + new Vector2(shapedGlyph.XOffset, shapedGlyph.YOffset);
 					var s = Vector2.Zero;
+#if MOONWORKS
+					var glyph = GetGlyphById(null, null, shapedGlyph.GlyphId, shapedGlyph.FontSourceId, effect, effectAmount);
+#else
 					var glyph = GetGlyphById(null, shapedGlyph.GlyphId, shapedGlyph.FontSourceId, effect, effectAmount);
+#endif
 					if (glyph != null && !glyph.IsEmpty)
 					{
 						// Apply HarfBuzz positioning

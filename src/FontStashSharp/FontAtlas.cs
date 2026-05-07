@@ -175,7 +175,9 @@ namespace FontStashSharp
 			return true;
 		}
 
-#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
+#if MOONWORKS
+		public void RenderGlyph(GraphicsDevice graphicsDevice, ResourceUploader resourceUploader, DynamicFontGlyph glyph, IFontSource fontSource, GlyphRenderer glyphRenderer, GlyphRenderResult glyphRenderResult, int kernelWidth, int kernelHeight)
+#elif MONOGAME || FNA || XNA || STRIDE
 		public void RenderGlyph(GraphicsDevice graphicsDevice, DynamicFontGlyph glyph, IFontSource fontSource, GlyphRenderer glyphRenderer, GlyphRenderResult glyphRenderResult, int kernelWidth, int kernelHeight)
 #else
 		public void RenderGlyph(ITexture2DManager textureManager, DynamicFontGlyph glyph, IFontSource fontSource, GlyphRenderer glyphRenderer, GlyphRenderResult glyphRenderResult, int kernelWidth, int kernelHeight)
@@ -231,7 +233,9 @@ namespace FontStashSharp
 				eraseArea.Height = Height - eraseArea.Y;
 			}
 
-#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
+#if MOONWORKS
+			Texture2DManager.SetTextureData(resourceUploader, Texture, eraseArea, colorBuffer);
+#elif MONOGAME || FNA || XNA || STRIDE
 			Texture2DManager.SetTextureData(Texture, eraseArea, colorBuffer);
 #else
 			textureManager.SetTextureData(Texture, eraseArea, colorBuffer);
@@ -256,7 +260,9 @@ namespace FontStashSharp
 			glyphRenderer(buffer, colorBuffer, glyphRenderOptions);
 
 			// Render glyph to texture
-#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
+#if MOONWORKS
+			Texture2DManager.SetTextureData(resourceUploader, Texture, glyph.TextureRectangle, colorBuffer);
+#elif MONOGAME || FNA || XNA || STRIDE
 			Texture2DManager.SetTextureData(Texture, glyph.TextureRectangle, colorBuffer);
 #else
 			textureManager.SetTextureData(Texture, glyph.TextureRectangle, colorBuffer);

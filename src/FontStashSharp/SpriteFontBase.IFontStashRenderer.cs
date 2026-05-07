@@ -31,7 +31,9 @@ namespace FontStashSharp
 				return;
 			}
 
-#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
+#if MOONWORKS
+			var white = GetWhite(renderer.GraphicsDevice, renderer.ResourceUploader);
+#elif MONOGAME || FNA || XNA || STRIDE
 			var white = GetWhite(renderer.GraphicsDevice);
 #else
 			var white = GetWhite(renderer.TextureManager);
@@ -68,7 +70,7 @@ namespace FontStashSharp
 #if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
 			if (renderer.GraphicsDevice == null)
 			{
-				throw new ArgumentNullException("renderer.GraphicsDevice can't be null.");
+				throw new ArgumentNullException(nameof(renderer.GraphicsDevice), "renderer.GraphicsDevice can't be null.");
 			}
 #else
 			if (renderer.TextureManager == null)
@@ -111,7 +113,9 @@ namespace FontStashSharp
 					continue;
 				}
 
-#if MONOGAME || FNA || XNA || STRIDE || MOONWORKS
+#if MOONWORKS
+				var glyph = GetGlyph(renderer.GraphicsDevice, renderer.ResourceUploader, codepoint, effect, effectAmount);
+#elif MONOGAME || FNA || XNA || STRIDE
 				var glyph = GetGlyph(renderer.GraphicsDevice, codepoint, effect, effectAmount);
 #else
 				var glyph = GetGlyph(renderer.TextureManager, codepoint, effect, effectAmount);
