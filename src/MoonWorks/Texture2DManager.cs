@@ -36,8 +36,7 @@ public static class Texture2DManager
 				H = (uint)bounds.Height,
 				D = 1
 			},
-			data[..(int)dataSize],
-			false
+			data[..(int)dataSize]
 		);
 	}
 }
